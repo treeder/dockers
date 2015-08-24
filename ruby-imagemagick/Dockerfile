@@ -1,8 +1,8 @@
-FROM alpine
+FROM treeder/ruby
 
 RUN apk update && apk upgrade
 
-RUN apk add ruby ruby-io-console ruby-bundler
+RUN apk add imagemagick
 
 # Clean APK cache
 RUN rm -rf /var/cache/apk/*
