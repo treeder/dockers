@@ -1,5 +1,5 @@
 # To test this script before building an image:
-#  docker run --rm -v $PWD:/app -w /app golang:1.4.2-cross sh go.sh vendor
+# docker run --rm -v $PWD:/app -w /app golang:1.4.2-cross sh go.sh version
 
 # Original command to vendor
 # docker run --rm -it -v "$PWD":/go/src/x/y/z -w /go/src/x/y/z -e "GOPATH=/go/src/x/y/z/vendor:/go" golang go get
@@ -8,11 +8,9 @@
 # Original command to cross compile:
 
 cmd="$1"
-echo "Args: $*"
-if [ "$#" -gt 0 ]
+# echo "Args: $*"
+if [ "$#" -lt 1 ]
 then
-    echo "There's Beans"
-else
     echo "No command provided."
     exit 1
 fi
@@ -22,20 +20,27 @@ p=/go/src/x/y/z
 mkdir -p $p
 cp -r * $p
 cd $p
-# Add vendor to the GOPATH so get will pull it in
+# Add vendor to the GOPATH so get will pull it in the right spot
 export GOPATH=$p/vendor:/go
-env
+# env
+
+vendor () {
+  go get
+  cp -r -u $1/vendor $2
+  chmod -R a+rw $2/vendor
+  #      cd $wd
+}
+build () {
+  go "$1"
+  cp -r -u * $2
+}
 
 case "$1" in
   vendor)  echo "Vendoring dependencies..."
-      go get
-      cp -r -u $p/vendor $wd
-      chmod -R a+rw $wd/vendor
-#      cd $wd
+      vendor $p $wd
       ;;
   build)  echo  "Building..."
-      go "$@"
-      cp -r -u * $wd
+      build $@ $wd
       ;;
   cross)  echo  "Cross compiling..."
       for GOOS in darwin linux windows; do
@@ -53,6 +58,17 @@ case "$1" in
   static) echo  "Building static binary..."
       CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags="-s" -o static
       cp static $wd
+      ;;
+  remote) echo  "Building binary from $2"
+      git clone $2 repo
+      cd repo
+      ls -al
+      wd=$PWD
+      vendor $p $wd
+      build
+      ;;
+  version)
+      go version
       ;;
   *) echo "Invalid command, see https://github.com/treeder/dockers/tree/master/go for reference."
       ;;

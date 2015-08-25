@@ -1,17 +1,6 @@
 FROM golang:1.4.2-cross
 
-RUN apk update && apk upgrade
-
-RUN apk add curl git make
-RUN apk add openssl-dev build-base
-RUN apk add ruby-dev ruby ruby-io-console ruby-bundler
-# For pg gem:
-#RUN apk add postgresql-dev
-
-# Clean APK cache
-RUN rm -rf /var/cache/apk/*
-
-ADD update-and-install.sh /scripts/
+ADD go.sh /scripts/
 
 # Default is to update and install dependencies
-CMD ["sh", "/scripts/update-and-install.sh"]
+CMD ["sh", "/scripts/go.sh"]

@@ -25,3 +25,27 @@ And how about another one at the same time:
 ```sh
 docker exec -it dind docker run -e "PORT=8081" -p 8081:8081 treeder/hello-sinatra
 ```
+
+## Building this image
+
+Get Docker in Docker files:
+
+```sh
+docker export $(docker create rancher/docker:1.8.1) > files.tar
+```
+
+```sh
+docker build -t treeder/ruby-dind:latest .
+```
+
+Tag with Docker version too:
+
+```sh
+docker tag treeder/ruby-dind:latest treeder/ruby-dind:r2.2.2-d1.8.1
+```
+
+Push it:
+
+```sh
+docker push treeder/ruby-dind
+```

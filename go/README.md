@@ -11,26 +11,50 @@ This image can perform the following functions:
 
 ## Usage
 
-Vendor dependencies:
+### Vendor dependencies:
 
 ```sh
 docker run --rm -v $PWD:/app -w /app treeder/go vendor
 ```
 
-Build:
+### Build:
 
 ```sh
 docker run --rm -v $PWD:/app -w /app treeder/go build -o myapp
 ```
 
-Cross compile:
+### Run it:
+
+```sh
+docker run --rm -v $PWD:/app -w /app golang run -o myapp
+```
+
+### Cross compile:
 
 ```sh
 docker run --rm -v $PWD:/app -w /app treeder/go cross
 ```
 
-Build static binary:
+### Build static binary:
 
 ```sh
 docker run --rm -v $PWD:/app -w /app treeder/go static
 ```
+
+### Build a remote git repo:
+
+This one will get a remote repo and produce a binary:
+
+```sh
+docker run --rm treeder/go remote https://github.com/treeder/go-docker.git
+```
+
+### Check Go version:
+
+```sh
+docker run --rm -v $PWD:/app -w /app treeder/go version
+```
+
+## TODO:
+
+Cross compile works if we use the big golang:1.4.2-cross. But do you need to cross compile if you're just using it inside Docker?
