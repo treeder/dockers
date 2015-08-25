@@ -8,3 +8,5 @@ RUN apt-get install -y \
    git
 
 RUN /home/install-ubuntu.sh
+
+ENTRYPOINT ["heroku"]
