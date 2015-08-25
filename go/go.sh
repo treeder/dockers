@@ -31,7 +31,9 @@ vendor () {
   #      cd $wd
 }
 build () {
-  go "$1"
+  echo "build $1 $2"
+  go $1
+  ls -al
   cp -r -u * $2
 }
 
@@ -60,12 +62,23 @@ case "$1" in
       cp static $wd
       ;;
   remote) echo  "Building binary from $2"
+      pwd
+      userwd=$wd
+      cd
       git clone $2 repo
       cd repo
       ls -al
       wd=$PWD
+      # Need to redo some initial setup here:
+      cp -r * $p
+      cd $p
       vendor $p $wd
-      build
+      build "build -o app" $wd
+      ls -al $wd
+      cp $wd/app $userwd
+      echo "userwd $userwd"
+      ls -al $userwd
+      chmod a+rwx $userwd/app
       ;;
   version)
       go version

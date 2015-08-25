@@ -3,4 +3,4 @@ vendor/
 /static
 /z
 /hello
-app.go
+/app
