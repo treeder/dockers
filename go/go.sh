@@ -7,6 +7,8 @@
 # docker run --rm -it -v $PWD:/go/src/x/y/z -w /go/src/x/y/z -e "GOPATH=/go/src/x/y/z/vendor:/go" golang go build -o hello
 # Original command to cross compile:
 
+set -e
+
 cmd="$1"
 # echo "Args: $*"
 if [ "$#" -lt 1 ]
@@ -15,6 +17,7 @@ then
     exit 1
 fi
 
+# echo $PWD
 wd=$PWD
 p=/go/src/x/y/z
 mkdir -p $p
@@ -24,17 +27,26 @@ cd $p
 export GOPATH=$p/vendor:/go
 # env
 
+# Pass in: $# MIN_ARGS
+validate () {
+  if [ "$1" -lt $2 ]
+  then
+      echo "No command provided."
+      exit 1
+  fi
+}
 vendor () {
   go get
-  cp -r -u $1/vendor $2
+  cp -r $1/vendor $2
   chmod -R a+rw $2/vendor
   #      cd $wd
 }
 build () {
-  echo "build $1 $2"
-  go $1
+  echo "build: $1 $2"
+  go build $1
   ls -al
-  cp -r -u * $2
+  cp app $2
+  chmod a+rwx $wd/app
 }
 
 case "$1" in
@@ -42,7 +54,7 @@ case "$1" in
       vendor $p $wd
       ;;
   build)  echo  "Building..."
-      build $@ $wd
+      build "-o app" $wd
       ;;
   cross)  echo  "Cross compiling..."
       for GOOS in darwin linux windows; do
@@ -60,8 +72,10 @@ case "$1" in
   static) echo  "Building static binary..."
       CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags="-s" -o static
       cp static $wd
+      chmod a+rwx $wd/static
       ;;
   remote) echo  "Building binary from $2"
+      validate $# 2
       pwd
       userwd=$wd
       cd
@@ -73,12 +87,25 @@ case "$1" in
       cp -r * $p
       cd $p
       vendor $p $wd
-      build "build -o app" $wd
+      build "-o app" $wd
       ls -al $wd
       cp $wd/app $userwd
       echo "userwd $userwd"
       ls -al $userwd
       chmod a+rwx $userwd/app
+      ;;
+  image) echo  "Building Docker image '$2'..."
+      validate $# 2
+      ls -al /usr/bin/docker
+      build "-o app" $wd
+      /usr/bin/docker version
+      cp /scripts/lib/Dockerfile $p
+      /usr/bin/docker build -t $2 .
+      # perhaps an alternative to this would be to do dind, replace the FROM with treeder/go-dind for example:
+#      cp /scripts/lib/Dockerfile $p
+#      /usr/bin/dockerlaunch /usr/bin/docker -d -D &
+#      sleep 3
+#      docker build -t $2 .
       ;;
   version)
       go version

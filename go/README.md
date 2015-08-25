@@ -24,16 +24,50 @@ docker run --rm -v $PWD:/app -w /app treeder/go vendor
 docker run --rm -v $PWD:/app -w /app treeder/go build -o app
 ```
 
-### Run it:
+### Run:
 
 ```sh
-docker run --rm -v $PWD:/app -w /app golang ./app
+docker run --rm -v $PWD:/app -w /app -p 8080:8080 iron/base ./app
+```
+
+The iron/go image is a very small image you can run this on.
+
+## Advanced Commands
+
+### Build a remote git repo:
+
+This produce a binary given a remote git repo containing a Go program.
+
+```sh
+docker run --rm -v $PWD:/app -w /app treeder/go remote https://github.com/treeder/go-docker.git
+```
+
+You'll end up with a binary called `app` which you can run with the same command as above.
+
+### Build a Docker image out of your program:
+
+This will build a Docker image with your program inside it.
+
+The argument after image is `IMAGE_NAME:tag`. Also, note the extra mount here, that's required to talk to the Docker host.
+
+```sh
+docker run --rm -v $PWD:/app -w /app -v /var/run/docker.sock:/var/run/docker.sock treeder/go image treeder/myapp:latest
+```
+
+Boom, creates a small Docker image for you. Run `docker images` to check it out, should be about ~12MB total.
+
+Test your new image:
+
+```sh
+docker run --rm -v $PWD:/app -w /app -p 8080:8080 treeder/myapp
 ```
 
 ### Cross compile:
 
+This uses a different image, treeder/go-cross, to do a cross compile.
+
 ```sh
-docker run --rm -v $PWD:/app -w /app treeder/go cross
+docker run --rm -v $PWD:/app -w /app treeder/go-cross cross
 ```
 
 ### Build static binary:
@@ -42,22 +76,30 @@ docker run --rm -v $PWD:/app -w /app treeder/go cross
 docker run --rm -v $PWD:/app -w /app treeder/go static
 ```
 
-### Build a remote git repo:
-
-This one will get a remote repo and produce a binary:
-
-```sh
-docker run --rm -v $PWD:/app -w /app treeder/go remote https://github.com/treeder/go-docker.git
-```
-
-You'll end up with a binary called `app` which you can run with the same command as above.
-
 ### Check Go version:
 
 ```sh
-docker run --rm -v $PWD:/app -w /app treeder/go version
+docker run --rm treeder/go version
 ```
 
 ## TODO:
 
-Cross compile works if we use the big golang:1.4.2-cross. But do you need to cross compile if you're just using it inside Docker?
+...
+
+## Building this image
+
+```sh
+docker build -t treeder/go:latest .
+```
+
+Tag it with Go version too (can check with `docker run --rm treeder/go version`):
+
+```sh
+docker tag treeder/go:latest treeder/go:1.4.2
+```
+
+Push:
+
+```sh
+docker push treeder/go
+```
