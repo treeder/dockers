@@ -6,9 +6,10 @@ This image can perform the following functions:
 
 * vendor - vendors your dependencies into a /vendor directory.  
 * build - builds your program using the vendored dependencies.
+* remote - this one will produce a binary from a github repo. Equivalent to cloning, vendoring and building.
+* image - this will build and create a Docker image out of your program.
 * cross - cross compile your program into a variety of platforms. Based on [this](https://medium.com/iron-io-blog/how-to-cross-compile-go-programs-using-docker-beaa102a316d#95d9).
 * static - statically compile your program. This is great for making the [tiniest Docker image possible](http://www.iron.io/blog/2015/07/an-easier-way-to-create-tiny-golang-docker-images.html).
-* remote - this one will produce a binary from a github repo. Equivalent to cloning, vendoring and building.
 
 ## Usage
 
@@ -26,11 +27,12 @@ docker run --rm -v $PWD:/app -w /app treeder/go build -o app
 
 ### Run:
 
+This is just a normal Docker run. I'm using iron/base here because it's a tiny image that has
+everything you need to run your Go binary on.
+
 ```sh
 docker run --rm -v $PWD:/app -w /app -p 8080:8080 iron/base ./app
 ```
-
-The iron/go image is a very small image you can run this on.
 
 ## Advanced Commands
 
@@ -71,6 +73,8 @@ docker run --rm -v $PWD:/app -w /app treeder/go-cross cross
 ```
 
 ### Build static binary:
+
+This is great for making the [tiniest Docker image possible](http://www.iron.io/blog/2015/07/an-easier-way-to-create-tiny-golang-docker-images.html)
 
 ```sh
 docker run --rm -v $PWD:/app -w /app treeder/go static
