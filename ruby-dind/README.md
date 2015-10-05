@@ -2,6 +2,25 @@ Ruby and Docker in Docker on Alpine.
 
 ## Usage
 
+### Basic usage:
+
+You can use this container like any other, it's got Ruby and Docker installed in it.
+
+```sh
+docker run --rm -it --privileged treeder/ruby-dind /bin/sh
+```
+
+To start Docker inside the container, run `rc default`.
+
+To start Docker and something else in the container:
+
+```sh
+docker run --rm -it --privileged treeder/ruby-dind sh -c 'rc default && /bin/sh'
+```
+
+
+### To start container as a daemon then run commands in it
+
 Start container:
 
 ```sh
@@ -31,17 +50,25 @@ docker exec -it dind docker run -e "PORT=8081" -p 8081:8081 treeder/hello-sinatr
 Get Docker in Docker files:
 
 ```sh
-docker export $(docker create rancher/docker:1.8.1) > files.tar
+docker export $(docker create rancher/docker) > files.tar
 ```
 
 ```sh
 docker build -t treeder/ruby-dind:latest .
 ```
 
-Tag with Docker version too:
+Tag versions:
+
+Get versions with:
+
+```
+docker run --rm treeder/ruby-dind sh -c 'ruby -v; docker version'
+```
+
+Then tag with:
 
 ```sh
-docker tag treeder/ruby-dind:latest treeder/ruby-dind:r2.2.2-d1.8.1
+docker tag treeder/ruby-dind:latest treeder/ruby-dind:rX.Y.Z-dA.B.C
 ```
 
 Push it:
