@@ -1,6 +1,23 @@
 Go and Docker in Docker on Alpine.
 
-## Usage
+
+### Basic usage:
+
+You can use this container like any other, it's got Ruby and Docker installed in it.
+
+```sh
+docker run --rm -it --privileged treeder/go-dind /bin/sh
+```
+
+To start Docker inside the container, run `rc default`.
+
+To start Docker and something else in the container:
+
+```sh
+docker run --rm -it --privileged treeder/go-dind sh -c 'rc default && /bin/sh'
+```
+
+### To start container as a daemon then run commands in it
 
 Start container:
 
@@ -29,10 +46,6 @@ docker exec -it dind docker run -e "PORT=8081" -p 8081:8081 treeder/hello.go
 ## Building this image
 
 Get Docker in Docker files:
-
-```sh
-docker export $(docker create rancher/docker:1.8.1) > files.tar
-```
 
 ```sh
 docker build -t treeder/go-dind:latest .

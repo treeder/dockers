@@ -1,13 +1,13 @@
 FROM iron/go
 
-#RUN apk update && apk upgrade
+RUN echo '@community http://nl.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories
+RUN apk update && apk upgrade
+
+RUN apk add docker@community
+# puts file in /etc/runlevels/...
+RUN rc-update add docker default
+
+CMD ["/sbin/rc", "default"]
+
 # Clean APK cache
-#RUN rm -rf /var/cache/apk/*
-
-# run this to get files.tar
-# docker export $(docker create rancher/docker) > files.tar
-
-ADD files.tar /
-ENTRYPOINT ["/usr/bin/dockerlaunch", "/usr/bin/docker"]
-VOLUME /var/lib/docker
-CMD ["-d", "-D"]
+RUN rm -rf /var/cache/apk/*
