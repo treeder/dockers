@@ -1,19 +1,29 @@
-This one builds off treeder/ruby and adds ImageMagick into it.
+This one has Ruby and ImageMagick in it.
 
 ## Using
 
 ```sh
-docker run -it --rm treeder/php php -v
+docker run -it --rm treeder/ruby-imagemagick ruby -v
 ```
 
 ## Building
 
 ```sh
-docker build -t treeder/php:latest .
+docker build -t treeder/ruby-imagemagick:latest .
 ```
+
+Tag with versions, check with `docker run -it --rm treeder/ruby-imagemagick convert -version` and
+`docker run -it --rm treeder/ruby-imagemagick ruby -v`
+
+```sh
+docker tag treeder/ruby-imagemagick:latest treeder/ruby-imagemagick:X.Y.Z-A.B.C
+```
+
+X.Y.Z being Ruby version and A.B.C being imagemagic version.
+
 
 Push:
 
 ```sh
-docker push treeder/php
+docker push treeder/ruby-imagemagick
 ```

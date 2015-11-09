@@ -1,4 +1,4 @@
-FROM treeder/ruby
+FROM iron/ruby
 
 RUN apk update && apk upgrade
 
