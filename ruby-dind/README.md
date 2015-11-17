@@ -47,22 +47,18 @@ docker exec -it dind docker run -e "PORT=8081" -p 8081:8081 treeder/hello-sinatr
 
 ## Building this image
 
-Get Docker in Docker files:
-
-```sh
-docker export $(docker create rancher/docker) > files.tar
-```
-
 ```sh
 docker build -t treeder/ruby-dind:latest .
 ```
+
+NOTE: Add --no-cache to ensure you get latest stuff. 
 
 Tag versions:
 
 Get versions with:
 
 ```
-docker run --rm treeder/ruby-dind sh -c 'ruby -v; docker version'
+docker run --rm --privileged treeder/ruby-dind sh -c 'rc default && sleep 5 && ruby -v; docker version'
 ```
 
 Then tag with:
