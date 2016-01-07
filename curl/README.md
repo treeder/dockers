@@ -21,5 +21,5 @@ docker tag treeder/curl:latest treeder/curl:X.Y.Z
 Push it:
 
 ```sh
-docker push treeder/go-dind
+docker push treeder/curl
 ```
