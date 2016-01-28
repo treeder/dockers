@@ -9,7 +9,7 @@ docker run --rm treeder/curl -X POST -d "fizz=buzz" http://requestb.in/uaf4hdua
 Grab a file:
 
 ```sh
-docker run --rm treeder/curl -v $PWD:/app -w /app  -L -O https://github.com/treeder/sshttp/releases/download/v0.0.1/sshttp
+docker run --rm  -v $PWD:/app -w /app treeder/curl -L -O https://github.com/treeder/sshttp/releases/download/v0.0.1/sshttp
 ```
 
 ## Building this image
