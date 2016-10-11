@@ -35,3 +35,5 @@ build/
 .rvmrc
 
 files.tar
+
+vendor/

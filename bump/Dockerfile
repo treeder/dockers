@@ -1,6 +1,6 @@
-FROM iron/ruby:dev
+FROM iron/base
 
+ADD bump /script/
 WORKDIR /app
-RUN gem install --no-ri --no-rdoc bump
 
-ENTRYPOINT ["bump", "--no-commit", "--no-bundle"]
+ENTRYPOINT ["/script/bump"]
