@@ -1,3 +1,3 @@
 set -ex
 
-docker build -t treeder/hello .
+docker build -t treeder/hello:sh .
