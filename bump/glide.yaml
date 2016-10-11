@@ -1,0 +1,5 @@
+package: .
+import:
+- package: github.com/coreos/go-semver
+  subpackages:
+  - semver
