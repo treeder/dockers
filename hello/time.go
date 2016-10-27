@@ -15,9 +15,9 @@ func main() {
 	// just to create this one container for docker start command
 	run("docker run --name reuse treeder/hello:sh")
 	cmds := []string{
-		// "./hello.sh",
-		// "docker run treeder/hello:sh",
-		// "docker run --rm treeder/hello:sh",
+		"./hello.sh",
+		"docker run treeder/hello:sh",
+		"docker run --rm treeder/hello:sh",
 		"docker start -a reuse",
 	}
 	for _, cmd := range cmds {
