@@ -11,13 +11,12 @@ import (
 )
 
 func main() {
+	fmt.Println("ARGS:", os.Args)
+	arg := "patch"
 	if len(os.Args) < 2 {
-		log.Fatal("Invalid arg")
-	}
-	arg := os.Args[1]
-	if arg == "" {
-		arg = "patch"
+		// log.Fatal("Invalid arg")
 	} else {
+		arg = os.Args[1]
 		arg = strings.ToLower(arg)
 	}
 
