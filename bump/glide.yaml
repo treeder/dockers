@@ -3,3 +3,4 @@ import:
 - package: github.com/coreos/go-semver
   subpackages:
   - semver
+- package: github.com/urfave/cli
