@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/coreos/go-semver/semver"
@@ -28,10 +29,11 @@ func main() {
 
 func bump(c *cli.Context) error {
 	arg := "patch"
-	if len(os.Args) < 2 {
+	// fmt.Println("ARGS:", c.Args())
+	if len(c.Args()) < 1 {
 		// log.Fatal("Invalid arg")
 	} else {
-		arg = os.Args[1]
+		arg = c.Args().First()
 		arg = strings.ToLower(arg)
 	}
 
@@ -40,7 +42,11 @@ func bump(c *cli.Context) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	vs := strings.TrimSpace(string(vbytes))
+
+	re := regexp.MustCompile(`(\d+\.)?(\d+\.)?(\*|\d+)`)
+	loc := re.FindIndex(vbytes)
+	// fmt.Println(loc)
+	vs := string(vbytes[loc[0]:loc[1]])
 	fmt.Println("Current version:", vs)
 
 	v := semver.New(vs)
@@ -56,7 +62,12 @@ func bump(c *cli.Context) error {
 	}
 	fmt.Println("New version:", v)
 
-	err = ioutil.WriteFile(filename, []byte(v.String()), 0644)
+	b := vbytes[:loc[0]]
+	b = append(b, []byte(v.String())...)
+	b = append(b, vbytes[loc[1]:]...)
+	// fmt.Println(string(b))
+
+	err = ioutil.WriteFile(filename, b, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
