@@ -4,8 +4,8 @@ String operations. Useful in shell scripts.
 
 ## Usage
 
-For complete usage, run:
+Example:
 
 ```sh
-docker run --rm treeder/strings --help
+docker run --rm -it treeder/strings contains "hello there" "hell"
 ```
