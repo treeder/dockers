@@ -24,7 +24,11 @@ func main() {
 			Usage: "filename to look for version in",
 		},
 	}
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		fmt.Println("ERROR:", err)
+		os.Exit(1)
+	}
 }
 
 func bump(c *cli.Context) error {
@@ -53,6 +57,9 @@ func bump(c *cli.Context) error {
 	re := regexp.MustCompile(`(\d+\.)?(\d+\.)?(\*|\d+)`)
 	loc := re.FindIndex(vbytes)
 	// fmt.Println(loc)
+	if loc == nil {
+		return fmt.Errorf("Did not find semantic version in %s", filename)
+	}
 	vs := string(vbytes[loc[0]:loc[1]])
 	fmt.Println("Current version:", vs)
 
