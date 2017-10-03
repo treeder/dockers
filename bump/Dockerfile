@@ -12,6 +12,6 @@ RUN cd $D && go build -o bump && cp bump /tmp/
 # final stage
 FROM alpine
 RUN apk add --no-cache ca-certificates curl
-WORKDIR /script
+WORKDIR /app
 COPY --from=build-env /tmp/bump /script/bump
 ENTRYPOINT ["/script/bump"]

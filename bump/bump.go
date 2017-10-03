@@ -69,10 +69,8 @@ func bump(c *cli.Context) error {
 		v.BumpMajor()
 	case "minor":
 		v.BumpMinor()
-	case "patch":
-		v.BumpPatch()
 	default:
-		log.Fatalln("Invalid arg:", arg)
+		v.BumpPatch()
 	}
 	fmt.Println("New version:", v)
 
