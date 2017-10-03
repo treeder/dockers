@@ -37,6 +37,13 @@ func bump(c *cli.Context) error {
 		arg = strings.ToLower(arg)
 	}
 
+	// check for `[bump X]` in input, user can pass in git commit messages to auto bump different versions
+	if strings.Contains(arg, "[bump minor]") {
+		arg = "minor"
+	} else if strings.Contains(arg, "[bump major]") {
+		arg = "major"
+	}
+
 	filename := c.String("filename")
 	vbytes, err := ioutil.ReadFile(filename)
 	if err != nil {
