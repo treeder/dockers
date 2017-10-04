@@ -24,7 +24,11 @@ func main() {
 			Usage: "filename to look for version in",
 		},
 	}
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		fmt.Println("ERROR:", err)
+		os.Exit(1)
+	}
 }
 
 func bump(c *cli.Context) error {
@@ -37,6 +41,13 @@ func bump(c *cli.Context) error {
 		arg = strings.ToLower(arg)
 	}
 
+	// check for `[bump X]` in input, user can pass in git commit messages to auto bump different versions
+	if strings.Contains(arg, "[bump minor]") {
+		arg = "minor"
+	} else if strings.Contains(arg, "[bump major]") {
+		arg = "major"
+	}
+
 	filename := c.String("filename")
 	vbytes, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -46,6 +57,9 @@ func bump(c *cli.Context) error {
 	re := regexp.MustCompile(`(\d+\.)?(\d+\.)?(\*|\d+)`)
 	loc := re.FindIndex(vbytes)
 	// fmt.Println(loc)
+	if loc == nil {
+		return fmt.Errorf("Did not find semantic version in %s", filename)
+	}
 	vs := string(vbytes[loc[0]:loc[1]])
 	fmt.Println("Current version:", vs)
 
@@ -55,10 +69,8 @@ func bump(c *cli.Context) error {
 		v.BumpMajor()
 	case "minor":
 		v.BumpMinor()
-	case "patch":
-		v.BumpPatch()
 	default:
-		log.Fatalln("Invalid arg:", arg)
+		v.BumpPatch()
 	}
 	fmt.Println("New version:", v)
 
