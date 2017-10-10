@@ -74,15 +74,13 @@ func bump(c *cli.Context) error {
 	}
 	fmt.Println("New version:", v)
 
-	loc1 := loc[1]
 	len1 := loc[1] - loc[0]
-	// fmt.Println("len1:", len1, len(v.String()))
-	if len(v.String()) > len1 {
-		loc1 += len(v.String()) - len1
-	}
-	b := vbytes[:loc[0]]
-	b = append(b, []byte(v.String())...)
-	b = append(b, vbytes[loc1:]...)
+	additionalBytes := len(v.String()) - len1
+	// Create and fill an extended buffer
+	b := make([]byte, len(vbytes) + additionalBytes)
+	copy(b[:loc[0]], vbytes[:loc[0]])
+	copy(b[loc[0]:loc[1]+additionalBytes], v.String())
+	copy(b[loc[1]+additionalBytes:], vbytes[loc[1]:])
 	// fmt.Println("writing:", string(b))
 
 	err = ioutil.WriteFile(filename, b, 0644)
