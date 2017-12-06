@@ -119,7 +119,6 @@ func getAndBump(vbytes []byte, part string) (old string, new string, loc []int, 
 	default:
 		v.BumpPatch()
 	}
-	fmt.Println("New version:", v)
 
 	len1 := loc[1] - loc[0]
 	additionalBytes := len(v.String()) - len1
