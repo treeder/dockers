@@ -23,6 +23,14 @@ func main() {
 			Value: "VERSION",
 			Usage: "filename to look for version in",
 		},
+		cli.StringFlag{
+			Name:  "input",
+			Usage: "use this if you want to pass in a string to pass, rather than read it from a file. Cannot be used with --filename.",
+		},
+		cli.BoolFlag{
+			Name:  "extract",
+			Usage: "this will just find the version and return it, does not modify anything. Safe operation.",
+		},
 	}
 	err := app.Run(os.Args)
 	if err != nil {
@@ -48,23 +56,62 @@ func bump(c *cli.Context) error {
 		arg = "major"
 	}
 
+	var err error
+	var vbytes []byte
 	filename := c.String("filename")
-	vbytes, err := ioutil.ReadFile(filename)
-	if err != nil {
-		log.Fatal(err)
+	if c.IsSet("input") {
+		vbytes = []byte(c.String("input"))
+	} else {
+		vbytes, err = ioutil.ReadFile(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
+	old, new, loc, err := getAndBump(vbytes, arg)
+	if err != nil {
+		return err
+	}
+	if c.Bool("extract") {
+		fmt.Println(old)
+		return nil
+	}
+
+	fmt.Fprintln(os.Stderr, "Old version:", old)
+	fmt.Fprintln(os.Stderr, "New version:", new)
+	if !c.IsSet("input") {
+		// write file
+		loc1 := loc[1]
+		len1 := loc[1] - loc[0]
+		// fmt.Println("len1:", len1, len(v.String()))
+		if len(new) > len1 {
+			loc1 += len(new) - len1
+		}
+		b := vbytes[:loc[0]]
+		b = append(b, []byte(new)...)
+		b = append(b, vbytes[loc1:]...)
+		// fmt.Println("writing:", string(b))
+
+		err = ioutil.WriteFile(filename, b, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	fmt.Println(new) // write it to stdout so scripts can use it
+	return nil
+}
+
+func getAndBump(vbytes []byte, part string) (old string, new string, loc []int, err error) {
 	re := regexp.MustCompile(`(\d+\.)?(\d+\.)?(\*|\d+)`)
-	loc := re.FindIndex(vbytes)
+	loc = re.FindIndex(vbytes)
 	// fmt.Println(loc)
 	if loc == nil {
-		return fmt.Errorf("Did not find semantic version in %s", filename)
+		return "", "", nil, fmt.Errorf("Did not find semantic version")
 	}
 	vs := string(vbytes[loc[0]:loc[1]])
-	fmt.Println("Current version:", vs)
 
 	v := semver.New(vs)
-	switch arg {
+	switch part {
 	case "major":
 		v.BumpMajor()
 	case "minor":
@@ -72,22 +119,6 @@ func bump(c *cli.Context) error {
 	default:
 		v.BumpPatch()
 	}
-	fmt.Println("New version:", v)
 
-	loc1 := loc[1]
-	len1 := loc[1] - loc[0]
-	// fmt.Println("len1:", len1, len(v.String()))
-	if len(v.String()) > len1 {
-		loc1 += len(v.String()) - len1
-	}
-	b := vbytes[:loc[0]]
-	b = append(b, []byte(v.String())...)
-	b = append(b, vbytes[loc1:]...)
-	// fmt.Println("writing:", string(b))
-
-	err = ioutil.WriteFile(filename, b, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return nil
+	return vs, v.String(), loc, nil
 }

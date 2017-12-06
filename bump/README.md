@@ -1,6 +1,6 @@
 # Bump
 
-Bumps version files.
+Bumps version files and other handy version tools.
 
 ## Usage
 
@@ -20,3 +20,4 @@ Or to pull it out of your last git commit, you can add `[bump major]` or `[bump 
 docker run --rm -it -v $PWD:/app -w /app treeder/bump --filename $version_file "$(git log -1 --pretty=%B)"
 ```
 
+Run `docker run --rm -it -v $PWD:/app -w /app treeder/bump --help` for more help.
