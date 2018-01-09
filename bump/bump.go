@@ -78,7 +78,7 @@ func bump(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	if c.Bool("extract") {
+	if c.Bool("extract") || c.String("format") != "" {
 		print(c, old)
 		return nil
 	}
