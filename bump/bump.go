@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/coreos/go-semver/semver"
@@ -30,6 +32,10 @@ func main() {
 		cli.BoolFlag{
 			Name:  "extract",
 			Usage: "this will just find the version and return it, does not modify anything. Safe operation.",
+		},
+		cli.StringFlag{
+			Name:  "format",
+			Usage: "either M for major, M-m for major-minor or M-m-p",
 		},
 	}
 	err := app.Run(os.Args)
@@ -73,7 +79,7 @@ func bump(c *cli.Context) error {
 		return err
 	}
 	if c.Bool("extract") {
-		fmt.Println(old)
+		print(c, old)
 		return nil
 	}
 
@@ -97,8 +103,32 @@ func bump(c *cli.Context) error {
 			log.Fatal(err)
 		}
 	}
-	fmt.Println(new) // write it to stdout so scripts can use it
+	print(c, new) // write it to stdout so scripts can use it
 	return nil
+}
+
+func print(c *cli.Context, version string) {
+	format := c.String("format")
+	if format == "" {
+		fmt.Println(version)
+		return
+	}
+
+	v := semver.New(version)
+	// else, we format it
+	var b bytes.Buffer
+	for _, char := range format {
+		if char == 'M' {
+			b.WriteString(strconv.FormatInt(v.Major, 10))
+		} else if char == 'm' {
+			b.WriteString(strconv.FormatInt(v.Minor, 10))
+		} else if char == 'p' {
+			b.WriteString(strconv.FormatInt(v.Patch, 10))
+		} else {
+			b.WriteRune(char)
+		}
+	}
+	fmt.Println(b.String())
 }
 
 func getAndBump(vbytes []byte, part string) (old string, new string, loc []int, err error) {
