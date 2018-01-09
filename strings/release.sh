@@ -2,13 +2,13 @@ set -ex
 
 # SET BELOW TO YOUR DOCKER HUB USERNAME
 USERNAME=treeder
-IMAGE=bump
+IMAGE=strings
 
 # Get latest
 git pull
 
 # bump version
-docker run --rm -v "$PWD":/app treeder/bump "$(git log -1 --pretty=%B)"
+docker run --rm -v "$PWD":/app treeder/bump patch
 version=`cat VERSION`
 echo "version: $version"
 

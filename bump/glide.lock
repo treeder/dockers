@@ -1,8 +1,0 @@
-hash: db1127f677089f2024b177f8fe80b8304aa04a30e2d1afbecaf7e0a000f837e0
-updated: 2016-10-11T15:21:25.412656112-07:00
-imports:
-- name: github.com/coreos/go-semver
-  version: 8ab6407b697782a06568d4b7f1db25550ec2e4c6
-  subpackages:
-  - semver
-testImports: []

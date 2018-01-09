@@ -1,21 +1,23 @@
-Bumps version files. 
+# Bump
 
+Bumps version files and other handy version tools.
 
 ## Usage
 
 ```sh
-docker run --rm -it -v $PWD:/app -w /app treeder/bump CMD
+docker run --rm -it -v $PWD:/app -w /app treeder/bump [--filename FILENAME] [CMD]
 ```
 
-CMD can be any:
+CMD can be one of:
 
-* patch
+* patch - default
 * minor
 * major
 
-## Building 
+Or to pull it out of your last git commit, you can add `[bump major]` or `[bump minor]` to your git commit message, then use:
 
 ```sh
-docker build -t treeder/bump .
-docker push treeder/bump
+docker run --rm -it -v $PWD:/app -w /app treeder/bump --filename $version_file "$(git log -1 --pretty=%B)"
 ```
+
+Run `docker run --rm -it -v $PWD:/app -w /app treeder/bump --help` for more help.
