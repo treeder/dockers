@@ -93,9 +93,12 @@ func bump(c *cli.Context) error {
 		if len(new) > len1 {
 			loc1 += len(new) - len1
 		}
+		// fmt.Println("loc0", loc[0], "loc1:", loc1, "len1:", len1, "len vbytes:", len(vbytes))
 		b := vbytes[:loc[0]]
 		b = append(b, []byte(new)...)
-		b = append(b, vbytes[loc1:]...)
+		if len(vbytes) > loc1 {
+			b = append(b, vbytes[loc1:]...)
+		}
 		// fmt.Println("writing:", string(b))
 
 		err = ioutil.WriteFile(filename, b, 0644)

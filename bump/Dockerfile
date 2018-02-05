@@ -10,7 +10,7 @@ ADD . $D
 RUN cd $D && go build -o bump && cp bump /tmp/
 
 # final stage
-FROM alpine
+FROM alpine:3.7
 RUN apk add --no-cache ca-certificates curl
 WORKDIR /app
 COPY --from=build-env /tmp/bump /script/bump
