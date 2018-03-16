@@ -74,7 +74,7 @@ func bump(c *cli.Context) error {
 		}
 	}
 
-	old, new, loc, err := getAndBump(vbytes, arg)
+	old, new, _, newcontent, err := getAndBump(vbytes, arg)
 	if err != nil {
 		return err
 	}
@@ -86,22 +86,7 @@ func bump(c *cli.Context) error {
 	fmt.Fprintln(os.Stderr, "Old version:", old)
 	fmt.Fprintln(os.Stderr, "New version:", new)
 	if !c.IsSet("input") {
-		// write file
-		loc1 := loc[1]
-		len1 := loc[1] - loc[0]
-		// fmt.Println("len1:", len1, len(v.String()))
-		if len(new) > len1 {
-			loc1 += len(new) - len1
-		}
-		// fmt.Println("loc0", loc[0], "loc1:", loc1, "len1:", len1, "len vbytes:", len(vbytes))
-		b := vbytes[:loc[0]]
-		b = append(b, []byte(new)...)
-		if len(vbytes) > loc1 {
-			b = append(b, vbytes[loc1:]...)
-		}
-		// fmt.Println("writing:", string(b))
-
-		err = ioutil.WriteFile(filename, b, 0644)
+		err = ioutil.WriteFile(filename, newcontent, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -134,14 +119,15 @@ func print(c *cli.Context, version string) {
 	fmt.Println(b.String())
 }
 
-func getAndBump(vbytes []byte, part string) (old string, new string, loc []int, err error) {
+func getAndBump(vbytes []byte, part string) (old string, new string, loc []int, newcontents []byte, err error) {
 	re := regexp.MustCompile(`(\d+\.)?(\d+\.)?(\*|\d+)`)
 	loc = re.FindIndex(vbytes)
 	// fmt.Println(loc)
 	if loc == nil {
-		return "", "", nil, fmt.Errorf("Did not find semantic version")
+		return "", "", nil, nil, fmt.Errorf("Did not find semantic version")
 	}
 	vs := string(vbytes[loc[0]:loc[1]])
+	// fmt.Printf("vs: '%v'", vs)
 
 	v := semver.New(vs)
 	switch part {
@@ -160,7 +146,7 @@ func getAndBump(vbytes []byte, part string) (old string, new string, loc []int, 
 	copy(b[:loc[0]], vbytes[:loc[0]])
 	copy(b[loc[0]:loc[1]+additionalBytes], v.String())
 	copy(b[loc[1]+additionalBytes:], vbytes[loc[1]:])
-	// fmt.Println("writing:", string(b))
+	// fmt.Printf("writing: '%v'", string(b))
 
-	return vs, v.String(), loc, nil
+	return vs, v.String(), loc, b, nil
 }
