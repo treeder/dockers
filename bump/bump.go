@@ -67,11 +67,13 @@ func bump(c *cli.Context) error {
 	filename := c.String("filename")
 	if c.IsSet("input") {
 		vbytes = []byte(c.String("input"))
-	} else {
+	} else if c.IsSet("filename") {
 		vbytes, err = ioutil.ReadFile(filename)
 		if err != nil {
 			log.Fatal(err)
 		}
+	} else {
+		log.Fatal("either filename or input flag must be used")
 	}
 
 	old, new, _, newcontent, err := getAndBump(vbytes, arg)
